@@ -38,9 +38,9 @@ RUN rm /etc/apt/apt.conf.d/20apt-esm-hook.conf
 # Distrobox image
 FROM ubuntu-toolbox AS ubuntu-distrobox
 
-
 COPY distrobox/packages /
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install \
     $(cat packages | xargs) && \
     rm -rd /var/lib/apt/lists/*
 RUN rm /packages
@@ -61,7 +61,8 @@ COPY wsl/wsl.conf /etc/wsl.conf
 
 # Install useful packages for WSL
 COPY wsl/packages /
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
-    $(cat packages.wsl | xargs) && \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    $(cat packages | xargs) && \
     rm -rd /var/lib/apt/lists/*
 RUN rm /packages
