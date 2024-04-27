@@ -1,5 +1,5 @@
 # Base toolbox image
-FROM docker.io/library/ubuntu:24.04 AS ubuntu-toolbox
+FROM docker.io/library/ubuntu:24.04 AS ubuntu-toolbox-base
 
 # Remove apt configuration optimized for containers
 # Remove docker-gzip-indexes to help with "command-not-found"
@@ -35,8 +35,28 @@ RUN ln -s /usr/libexec/flatpak-xdg-utils/flatpak-spawn /usr/bin/
 # Disable APT ESM hook which tries to enable some systemd services on each apt invocation
 RUN rm /etc/apt/apt.conf.d/20apt-esm-hook.conf
 
+
+# Toolbox image with extra tools installed
+FROM ubuntu-toolbox-base AS ubuntu-toolbox-extra
+
+COPY toolbox-extra/packages /
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    $(cat packages | xargs) && \
+    rm -rd /var/lib/apt/lists/*
+RUN rm /packages
+
+# Install inshellisense
+# https://github.com/microsoft/inshellisense
+RUN apt-get update && \
+    apt-get -y install nodejs npm && \
+    npm install -g @microsoft/inshellisense && \
+    apt-get -y remove npm && \
+    apt-get -y autoremove
+
+
 # Distrobox image
-FROM ubuntu-toolbox AS ubuntu-distrobox
+FROM ubuntu-toolbox-extra AS ubuntu-distrobox
 
 COPY distrobox/packages /
 RUN apt-get update && \
@@ -52,8 +72,9 @@ RUN ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/docker && \
 
 RUN echo "ALL            ALL = (ALL) NOPASSWD: ALL" >> /etc/sudoers
 
+
 # WSL image
-FROM ubuntu-toolbox AS ubuntu-wsl
+FROM ubuntu-toolbox-extra AS ubuntu-wsl
 
 # Create wsl.conf
 # See https://learn.microsoft.com/en-us/windows/wsl/wsl-config
