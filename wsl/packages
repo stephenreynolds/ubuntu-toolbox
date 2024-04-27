@@ -1,0 +1,9 @@
+apparmor
+command-not-found
+manpages
+nano
+openssh-client
+ubuntu-wsl
+unattended-upgrades
+update-manager-core
+wslu
