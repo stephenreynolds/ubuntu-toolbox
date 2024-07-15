@@ -35,7 +35,7 @@ jobs:
         base_name:
           - ubuntu-toolbox-base
           - ubuntu-toolbox-extra
-          - ubuntu-toolbox-distrobox
+          - ubuntu-distrobox
           - ubuntu-wsl
         include:
           - is_latest_version: true
