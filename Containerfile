@@ -14,7 +14,7 @@ RUN sed -Ei 's/^(hosts:.*)(\<files\>)\s*(.*)/\1\2 myhostname \3/' /etc/nsswitch.
 # Restore documentation but do not upgrade all packages
 # Install ubuntu-minimal & ubuntu-standard
 # Install extra packages as well as libnss-myhostname
-COPY toolbox/packages /
+COPY toolbox/packages /tmp/packages
 RUN sed -Ei '/apt-get (update|upgrade)/s/^/#/' /usr/local/sbin/unminimize && \
     apt-get update && \
     yes | /usr/local/sbin/unminimize && \
@@ -22,9 +22,9 @@ RUN sed -Ei '/apt-get (update|upgrade)/s/^/#/' /usr/local/sbin/unminimize && \
     ubuntu-minimal ubuntu-standard \
     libnss-myhostname \
     flatpak-xdg-utils \
-    $(cat packages | xargs) && \
+    $(cat /tmp/packages | xargs) && \
     rm -rd /var/lib/apt/lists/*
-RUN rm /packages
+RUN rm /tmp/*
 
 # Fix empty bind-mount to clear selinuxfs (see #337)
 RUN mkdir /usr/share/empty
@@ -39,12 +39,12 @@ RUN rm /etc/apt/apt.conf.d/20apt-esm-hook.conf
 # Toolbox image with extra tools installed
 FROM ubuntu-toolbox-base AS ubuntu-toolbox-extra
 
-COPY toolbox-extra/packages /
+COPY toolbox-extra/packages /tmp/packages
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install \
-    $(cat packages | xargs) && \
+    $(cat /tmp/packages | xargs) && \
     rm -rd /var/lib/apt/lists/*
-RUN rm /packages
+RUN rm /tmp/*
 
 # Distrobox image
 FROM ubuntu-toolbox-extra AS ubuntu-distrobox
@@ -72,9 +72,9 @@ FROM ubuntu-toolbox-extra AS ubuntu-wsl
 COPY wsl/wsl.conf /etc/wsl.conf
 
 # Install useful packages for WSL
-COPY wsl/packages /
+COPY wsl/packages /tmp/packages
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install \
-    $(cat packages | xargs) && \
+    $(cat /tmp/packages | xargs) && \
     rm -rd /var/lib/apt/lists/*
-RUN rm /packages
+RUN rm /tmp/*
