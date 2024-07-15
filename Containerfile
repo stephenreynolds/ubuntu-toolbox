@@ -46,15 +46,6 @@ RUN apt-get update && \
     rm -rd /var/lib/apt/lists/*
 RUN rm /packages
 
-# Install inshellisense
-# https://github.com/microsoft/inshellisense
-RUN apt-get update && \
-    apt-get -y install nodejs npm && \
-    npm install -g @microsoft/inshellisense && \
-    apt-get -y remove npm && \
-    apt-get -y autoremove
-
-
 # Distrobox image
 FROM ubuntu-toolbox-extra AS ubuntu-distrobox
 
