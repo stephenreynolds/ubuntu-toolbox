@@ -1,4 +1,4 @@
-name: Build ubuntu-toolbox
+name: Build arch-toolbox
 on:
   schedule:
     - cron: "20 18 * * *" # 8:20pm everyday
@@ -24,7 +24,7 @@ env:
 jobs:
   push-ghcr:
     name: Build and push image
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -33,10 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         base_name:
-          - ubuntu-toolbox-base
-          - ubuntu-toolbox-extra
-          - ubuntu-distrobox
-          - ubuntu-wsl
+          - arch-distrobox
         include:
           - is_latest_version: true
             is_stable_version: true
